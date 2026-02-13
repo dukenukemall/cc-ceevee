@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 interface UploadedFileProps {
   file: File;
   onClear: () => void;
+  onScan: () => void;
 }
 
-export function UploadedFile({ file, onClear }: UploadedFileProps) {
+export function UploadedFile({ file, onClear, onScan }: UploadedFileProps) {
   const sizeMB = (file.size / 1024 / 1024).toFixed(2);
 
   return (
@@ -33,6 +34,7 @@ export function UploadedFile({ file, onClear }: UploadedFileProps) {
       </div>
 
       <Button
+        onClick={onScan}
         className="w-full mt-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.97]"
         size="lg"
       >
