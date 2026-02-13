@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ceevee",
-  description: "Ceevee — Your modern web application",
+  title: "Ceevee — CV Scanner",
+  description: "Upload a CV and discover insights about any candidate with AI-powered web research.",
 };
 
 export default function RootLayout({
