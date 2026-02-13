@@ -9,6 +9,8 @@ import { ScanSkeleton } from "@/components/scan/ScanSkeleton";
 import { scanCv } from "@/actions/scanCv";
 import type { ScanWithResults } from "@/types/scan";
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
 export function UploadZone() {
   const [isDragging, setIsDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -21,30 +23,35 @@ export function UploadZone() {
       toast.error("Only PDF files are supported");
       return;
     }
-    console.log("[UploadZone] File accepted:", selectedFile.name);
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      toast.error("File too large. Maximum 10MB.");
+      return;
+    }
+    console.log("[UploadZone] File accepted:", selectedFile.name, selectedFile.size);
     setFile(selectedFile);
     setScanResult(null);
     toast.success(`${selectedFile.name} ready to scan`);
   }, []);
 
   const handleScan = async () => {
-    if (!file) return;
+    if (!file || isScanning) return;
     setIsScanning(true);
     console.log("[UploadZone] Starting scan for:", file.name);
 
     const formData = new FormData();
     formData.append("file", file);
 
-    try {
-      const result = await scanCv(formData);
-      setScanResult(result);
+    const result = await scanCv(formData);
+
+    if (result.error) {
+      console.error("[UploadZone] Scan error:", result.error);
+      toast.error(result.error);
+    } else if (result.data) {
+      setScanResult(result.data);
       toast.success("Scan complete!");
-    } catch (err) {
-      console.error("[UploadZone] Scan error:", err);
-      toast.error("Scan failed. Please try again.");
-    } finally {
-      setIsScanning(false);
     }
+
+    setIsScanning(false);
   };
 
   const resetAll = () => {
@@ -55,7 +62,7 @@ export function UploadZone() {
 
   if (isScanning) return <ScanSkeleton />;
   if (scanResult) return <ScanResults scan={scanResult} onReset={resetAll} />;
-  if (file) return <UploadedFile file={file} onClear={resetAll} onScan={handleScan} />;
+  if (file) return <UploadedFile file={file} onClear={resetAll} onScan={handleScan} isScanning={isScanning} />;
 
   return (
     <DropArea
