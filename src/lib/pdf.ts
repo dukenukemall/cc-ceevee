@@ -1,4 +1,5 @@
-import pdfParse from "pdf-parse";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdfParse = require("pdf-parse");
 
 export async function extractTextFromPdf(buffer: Buffer): Promise<string> {
   console.log("[pdf] Parsing PDF, size:", buffer.length);
